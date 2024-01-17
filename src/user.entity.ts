@@ -1,20 +1,44 @@
-import { Entity, PrimaryKey, Property } from '@mikro-orm/core';
+import {
+  Entity,
+  OneToMany,
+  OneToOne,
+  PrimaryKeyProp,
+  Property,
+  Ref,
+  ref,
+  Collection,
+} from "@mikro-orm/core";
+import { Account } from "./account.entity";
+import crypto from "crypto";
+import { Organization } from "./organization.entity";
 
 @Entity()
 export class User {
-
-  @PrimaryKey()
-  id!: number;
+  @OneToOne({ primary: true })
+  account!: Ref<Account>;
 
   @Property()
-  name: string;
+  username!: string;
 
-  @Property({ unique: true })
-  email: string;
+  @Property({ hidden: true })
+  password!: string;
 
-  constructor(name: string, email: string) {
-    this.name = name;
-    this.email = email;
+  @Property({ hidden: true })
+  salt!: string;
+
+  @OneToMany(() => Organization, (org) => org.owner)
+  organizations = new Collection<Organization>(this);
+
+  [PrimaryKeyProp]?: "account";
+
+  constructor(account: Account, username: string, password: string) {
+    this.account = ref(account);
+    this.username = username;
+
+    const salt = crypto.randomBytes(16).toString("hex");
+    this.salt = salt;
+    this.password = crypto
+      .pbkdf2Sync(password, salt, 1000, 64, `sha512`)
+      .toString(`hex`);
   }
-
 }

@@ -12,7 +12,8 @@
   "license": "MIT",
   "dependencies": {
     "@mikro-orm/core": "next",
-    "@mikro-orm/sqlite": "next",
+    "@mikro-orm/reflection": "^6.0.5-dev.7",
+    "@mikro-orm/sqlite": "^6.0.5-dev.7",
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
